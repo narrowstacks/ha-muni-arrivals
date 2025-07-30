@@ -1,0 +1,57 @@
+# Services for Muni Times integration
+
+refresh_data:
+  name: Refresh Transit Data
+  description: Manually refresh transit arrival data for all stops
+  fields:
+    stop_code:
+      name: Stop Code
+      description: Specific stop code to refresh (optional, refreshes all if not specified)
+      required: false
+      selector:
+        text:
+
+clear_cache:
+  name: Clear Cache
+  description: Clear cached transit data
+  fields:
+    stop_code:
+      name: Stop Code
+      description: Specific stop code to clear from cache (optional, clears all if not specified)
+      required: false
+      selector:
+        text:
+
+test_connection:
+  name: Test API Connection
+  description: Test the connection to the 511.org API
+  fields:
+    stop_code:
+      name: Test Stop Code
+      description: Stop code to use for testing the connection (optional, uses default test stop if not specified)
+      required: false
+      selector:
+        text:
+
+get_diagnostics:
+  name: Get Diagnostics
+  description: Get diagnostic information for troubleshooting
+  fields:
+    include_cache:
+      name: Include Cache Info
+      description: Include detailed cache information in diagnostics
+      required: false
+      default: true
+      selector:
+        boolean:
+    include_api_status:
+      name: Include API Status
+      description: Include API connection status and health information
+      required: false
+      default: true
+      selector:
+        boolean:
+
+reset_error_count:
+  name: Reset Error Count
+  description: Reset the error count and health monitoring statistics

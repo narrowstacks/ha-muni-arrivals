@@ -12,13 +12,22 @@
           "show_line_icons": "Show Line Icons",
           "time_format": "Time Format",
           "time_zone": "Time Zone"
+        },
+        "data_description": {
+          "api_key": "Get your free API key from 511.org/developers",
+          "agency": "Transit agency code (SF for San Francisco Muni)",
+          "update_interval": "How often to fetch new data (30-3600 seconds)",
+          "max_results": "Number of arrival times to show per line (1-10)",
+          "show_line_icons": "Display emoji icons for different transit types",
+          "time_format": "How to display arrival times",
+          "time_zone": "Your local time zone"
         }
       }
     },
     "error": {
       "cannot_connect": "Failed to connect to 511.org API",
-      "invalid_auth": "Invalid API key",
-      "unknown": "Unexpected error occurred"
+      "invalid_auth": "Invalid API key or connection failed",
+      "unknown": "Unexpected error occurred during setup"
     },
     "abort": {
       "already_configured": "This integration is already configured"
@@ -27,13 +36,131 @@
   "options": {
     "step": {
       "init": {
-        "title": "Muni Times Options",
+        "title": "Muni Times Configuration",
+        "description": "Configure caching, error handling, and display options",
         "data": {
           "update_interval": "Update Interval (seconds)",
           "max_results": "Maximum Results per Stop",
           "show_line_icons": "Show Line Icons",
           "time_format": "Time Format",
-          "time_zone": "Time Zone"
+          "time_zone": "Time Zone",
+          "cache_enabled": "Enable Caching",
+          "cache_duration": "Cache Duration (minutes)",
+          "cache_max_size": "Maximum Cache Size (MB)",
+          "retry_max_attempts": "Maximum Retry Attempts",
+          "retry_delay": "Retry Delay (seconds)",
+          "request_timeout": "Request Timeout (seconds)"
+        },
+        "data_description": {
+          "update_interval": "How often to fetch new data (30-3600 seconds)",
+          "max_results": "Number of arrival times to show per line (1-10)",
+          "show_line_icons": "Display emoji icons for different transit types",
+          "time_format": "How to display arrival times",
+          "time_zone": "Your local time zone",
+          "cache_enabled": "Cache data to show during API outages",
+          "cache_duration": "How long to keep cached data (5-180 minutes)",
+          "cache_max_size": "Maximum disk space for cache (1-100 MB)",
+          "retry_max_attempts": "How many times to retry failed requests (1-10)",
+          "retry_delay": "Wait time between retries (0.5-10.0 seconds)",
+          "request_timeout": "Maximum wait time for API responses (10-120 seconds)"
+        }
+      }
+    }
+  },
+  "services": {
+    "refresh_data": {
+      "name": "Refresh Transit Data",
+      "description": "Manually refresh transit arrival data",
+      "fields": {
+        "stop_code": {
+          "name": "Stop Code",
+          "description": "Specific stop to refresh (optional)"
+        }
+      }
+    },
+    "clear_cache": {
+      "name": "Clear Cache",
+      "description": "Clear cached transit data",
+      "fields": {
+        "stop_code": {
+          "name": "Stop Code",
+          "description": "Specific stop to clear from cache (optional)"
+        }
+      }
+    },
+    "test_connection": {
+      "name": "Test API Connection",
+      "description": "Test the connection to the 511.org API",
+      "fields": {
+        "stop_code": {
+          "name": "Test Stop Code",
+          "description": "Stop code to use for testing (optional)"
+        }
+      }
+    },
+    "get_diagnostics": {
+      "name": "Get Diagnostics",
+      "description": "Get diagnostic information for troubleshooting",
+      "fields": {
+        "include_cache": {
+          "name": "Include Cache Info",
+          "description": "Include cache information in diagnostics"
+        },
+        "include_api_status": {
+          "name": "Include API Status",
+          "description": "Include API health information"
+        }
+      }
+    },
+    "reset_error_count": {
+      "name": "Reset Error Count",
+      "description": "Reset error counters and health monitoring statistics"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "transit_arrivals": {
+        "name": "Transit Arrivals",
+        "state_attributes": {
+          "stop_code": {
+            "name": "Stop Code"
+          },
+          "stop_name": {
+            "name": "Stop Name"
+          },
+          "agency": {
+            "name": "Agency"
+          },
+          "last_updated": {
+            "name": "Last Updated"
+          },
+          "data_source": {
+            "name": "Data Source"
+          },
+          "connection_status": {
+            "name": "Connection Status"
+          },
+          "cache_status": {
+            "name": "Cache Status"
+          },
+          "cached_data_age_minutes": {
+            "name": "Cached Data Age (minutes)"
+          },
+          "error_count": {
+            "name": "Error Count"
+          },
+          "last_error": {
+            "name": "Last Error"
+          },
+          "api_health": {
+            "name": "API Health"
+          },
+          "success_rate": {
+            "name": "Success Rate"
+          },
+          "lines": {
+            "name": "Transit Lines"
+          }
         }
       }
     }
