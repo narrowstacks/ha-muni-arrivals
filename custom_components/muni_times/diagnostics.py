@@ -35,8 +35,8 @@ async def async_get_config_entry_diagnostics(
         "coordinator": {
             "last_update_success": coordinator.last_update_success,
             "last_update_success_time": (
-                coordinator.last_update_success.isoformat()
-                if coordinator.last_update_success
+                coordinator.last_successful_update.isoformat()
+                if coordinator.last_successful_update
                 else None
             ),
             "update_interval": str(coordinator.update_interval),
@@ -143,7 +143,7 @@ async def async_get_device_diagnostics(
         stop_data = coordinator.data[stop_code]
         diagnostics["current_data"] = {
             "arrivals_count": len(stop_data.get("arrivals", [])),
-            "last_updated": coordinator.last_update_success.isoformat() if coordinator.last_update_success else None,
+            "last_updated": coordinator.last_successful_update.isoformat() if coordinator.last_successful_update else None,
             "arrivals": stop_data.get("arrivals", []),
         }
     

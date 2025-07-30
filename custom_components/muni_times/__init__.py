@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -195,7 +195,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
                     "arrivals": stop_data,
                     "config": stop,
                     "from_cache": False,
-                    "last_updated": self.last_update_success,
+                    "last_updated": datetime.now(),
                 }
                 
                 _LOGGER.debug("Fresh data retrieved for stop %s", stop_code)
@@ -248,7 +248,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
             else:
                 # Complete success
                 self.consecutive_failures = 0
-                self.last_successful_update = self.last_update_success
+                self.last_successful_update = datetime.now()
             
             return data
         
@@ -304,7 +304,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
                     "arrivals": stop_data,
                     "config": stop_config,
                     "from_cache": False,
-                    "last_updated": self.last_update_success,
+                    "last_updated": datetime.now(),
                 }
                 
                 # Cache the result
