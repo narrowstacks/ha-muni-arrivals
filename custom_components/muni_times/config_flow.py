@@ -64,11 +64,13 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
             TIME_FORMAT_FULL
         ]),
         vol.Optional(CONF_TIME_ZONE, default=DEFAULT_TIME_ZONE): str,
+        vol.Required(CONF_STOPS): str,  # Comma-separated list of stop codes
     }
 )
 
 STEP_OPTIONS_SCHEMA = vol.Schema(
     {
+        vol.Optional(CONF_STOPS): str,  # Comma-separated list of stop codes
         vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL): vol.All(
             int, vol.Range(min=30, max=3600)
         ),
@@ -170,8 +172,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
             else:
-                # Add empty stops array - user will configure stops later
-                user_input[CONF_STOPS] = []
+                # Parse stops from comma-separated string
+                stops_string = user_input.get(CONF_STOPS, "")
+                if stops_string:
+                    # Convert comma-separated string to list of stop dictionaries
+                    stop_codes = [code.strip() for code in stops_string.split(",") if code.strip()]
+                    user_input[CONF_STOPS] = [{"stop_code": code, "stop_name": f"Stop {code}"} for code in stop_codes]
+                else:
+                    user_input[CONF_STOPS] = []
                 return self.async_create_entry(title=info["title"], data=user_input)
 
         return self.async_show_form(
@@ -191,15 +199,31 @@ class OptionsFlow(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
+            # Parse stops from comma-separated string if provided
+            if CONF_STOPS in user_input and user_input[CONF_STOPS]:
+                stops_string = user_input[CONF_STOPS]
+                stop_codes = [code.strip() for code in stops_string.split(",") if code.strip()]
+                user_input[CONF_STOPS] = [{"stop_code": code, "stop_name": f"Stop {code}"} for code in stop_codes]
+            elif CONF_STOPS in user_input:
+                user_input[CONF_STOPS] = []
+            
             # Update the config entry with new options
             return self.async_create_entry(title="", data=user_input)
 
         # Get current configuration values
         current_config = dict(self.config_entry.data)
         
+        # Convert current stops to comma-separated string for display
+        current_stops = current_config.get(CONF_STOPS, [])
+        stops_string = ", ".join([stop.get("stop_code", "") for stop in current_stops if stop.get("stop_code")])
+        
         # Create schema with current values as defaults
         options_schema = vol.Schema(
             {
+                vol.Optional(
+                    CONF_STOPS,
+                    default=stops_string
+                ): str,
                 vol.Optional(
                     CONF_UPDATE_INTERVAL,
                     default=current_config.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
@@ -251,6 +275,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             step_id="init",
             data_schema=options_schema,
             description_placeholders={
+                "stops_note": "Enter SF Muni stop codes separated by commas (e.g., 13543, 15552, 17217)",
                 "cache_note": "Caching helps provide data during API outages",
                 "retry_note": "Higher retry counts may slow down updates during network issues",
                 "timeout_note": "Longer timeouts may help with slow connections",

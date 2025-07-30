@@ -7,6 +7,7 @@
         "data": {
           "api_key": "511.org API Key",
           "agency": "Transit Agency",
+          "stops": "Stop Codes",
           "update_interval": "Update Interval (seconds)",
           "max_results": "Maximum Results per Stop",
           "show_line_icons": "Show Line Icons",
@@ -16,6 +17,7 @@
         "data_description": {
           "api_key": "Get your free API key from 511.org/developers",
           "agency": "Transit agency code (SF for San Francisco Muni)",
+          "stops": "Comma-separated list of Muni stop codes (e.g., 13543, 15552, 17217)",
           "update_interval": "How often to fetch new data (30-3600 seconds)",
           "max_results": "Number of arrival times to show per line (1-10)",
           "show_line_icons": "Display emoji icons for different transit types",
@@ -39,6 +41,7 @@
         "title": "Muni Times Configuration",
         "description": "Configure caching, error handling, and display options",
         "data": {
+          "stops": "Stop Codes",
           "update_interval": "Update Interval (seconds)",
           "max_results": "Maximum Results per Stop",
           "show_line_icons": "Show Line Icons",
@@ -52,6 +55,7 @@
           "request_timeout": "Request Timeout (seconds)"
         },
         "data_description": {
+          "stops": "Comma-separated list of Muni stop codes (e.g., 13543, 15552, 17217)",
           "update_interval": "How often to fetch new data (30-3600 seconds)",
           "max_results": "Number of arrival times to show per line (1-10)",
           "show_line_icons": "Display emoji icons for different transit types",
