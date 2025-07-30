@@ -1,0 +1,133 @@
+# Example Home Assistant configuration for Muni Times integration
+
+# The integration is set up through the UI (Settings > Devices & Services)
+# This file shows example configurations and automations you can use
+
+# Example automation to notify when bus is arriving soon
+automation:
+  - alias: "Bus Arrival Alert"
+    description: "Notify when the next bus arrives in less than 5 minutes"
+    trigger:
+      - platform: template
+        value_template: >
+          {% set sensor = states('sensor.muni_times_13543') %}
+          {% if sensor not in ['unknown', 'unavailable', 'No data', 'No arrivals'] %}
+            {% set minutes = sensor | regex_replace(' min', '') | int(0) %}
+            {{ minutes > 0 and minutes <= 5 }}
+          {% else %}
+            false
+          {% endif %}
+    condition:
+      - condition: time
+        after: "07:00:00"
+        before: "22:00:00"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🚌 Bus Alert"
+          message: >
+            Your bus ({{ state_attr('sensor.muni_times_13543', 'lines')[0]['line'] }}) 
+            arrives in {{ states('sensor.muni_times_13543') }}
+          data:
+            tag: bus_alert
+            group: transit
+
+  - alias: "Clear Bus Alert"
+    description: "Clear notification when bus has passed"
+    trigger:
+      - platform: template
+        value_template: >
+          {% set sensor = states('sensor.muni_times_13543') %}
+          {% if sensor not in ['unknown', 'unavailable', 'No data', 'No arrivals'] %}
+            {% set minutes = sensor | regex_replace(' min', '') | int(999) %}
+            {{ minutes > 5 }}
+          {% else %}
+            true
+          {% endif %}
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          message: "clear_notification"
+          data:
+            tag: bus_alert
+
+# Example sensor template for formatted arrival times
+template:
+  - sensor:
+      - name: "Next 3 Buses"
+        state: >
+          {% set lines = state_attr('sensor.muni_times_13543', 'lines') %}
+          {% if lines %}
+            {% set times = [] %}
+            {% for line in lines[:3] %}
+              {% for arrival in line.arrivals[:1] %}
+                {% set times = times + [line.line + ': ' + arrival.formatted_time] %}
+              {% endfor %}
+            {% endfor %}
+            {{ times | join(', ') if times else 'No arrivals' }}
+          {% else %}
+            No data
+          {% endif %}
+        icon: mdi:bus-clock
+
+# Example dashboard card configurations
+# Add these to your Lovelace dashboard
+
+# Basic entity card
+# - type: entity
+#   entity: sensor.muni_times_13543
+#   name: "24 Divisadero - Northbound"
+#   icon: mdi:bus
+
+# Detailed entities card
+# - type: entities
+#   title: "Transit Arrivals"
+#   entities:
+#     - entity: sensor.muni_times_13543
+#       name: "24 Divisadero - Northbound"
+#       secondary_info: >
+#         {% set lines = state_attr('sensor.muni_times_13543', 'lines') %}
+#         {% if lines and lines[0].arrivals %}
+#           Next: {{ lines[0].arrivals[0].formatted_time }}
+#           {% if lines[0].arrivals[1] is defined %}
+#             , Then: {{ lines[0].arrivals[1].formatted_time }}
+#           {% endif %}
+#         {% endif %}
+
+# Custom card with multiple arrivals
+# - type: markdown
+#   title: "Transit Departures"
+#   content: |
+#     {% set lines = state_attr('sensor.muni_times_13543', 'lines') %}
+#     {% if lines %}
+#       {% for line in lines %}
+#         **{{ line.line }}** {% if line.destinations %}({{ line.destinations | join(', ') }}){% endif %}
+#         {% for arrival in line.arrivals %}
+#           {{- arrival.formatted_time }}{% if not loop.last %}, {% endif %}
+#         {% endfor %}
+#
+#       {% endfor %}
+#     {% else %}
+#       No transit data available
+#     {% endif %}
+
+# Script to check all transit sensors
+script:
+  check_all_transit:
+    alias: "Check All Transit"
+    sequence:
+      - variables:
+          transit_sensors: >
+            {{ states.sensor 
+               | selectattr('entity_id', 'match', 'sensor.muni_times_.*')
+               | list }}
+      - repeat:
+          for_each: "{{ transit_sensors }}"
+          sequence:
+            - service: logbook.log
+              data:
+                name: "Transit Check"
+                message: >
+                  {{ repeat.item.attributes.stop_name | default(repeat.item.entity_id) }}: 
+                  {{ repeat.item.state }}
+                entity_id: "{{ repeat.item.entity_id }}"

@@ -1,0 +1,41 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Muni Times Setup",
+        "description": "Configure your 511.org API access for transit arrival times",
+        "data": {
+          "api_key": "511.org API Key",
+          "agency": "Transit Agency",
+          "update_interval": "Update Interval (seconds)",
+          "max_results": "Maximum Results per Stop",
+          "show_line_icons": "Show Line Icons",
+          "time_format": "Time Format",
+          "time_zone": "Time Zone"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to 511.org API",
+      "invalid_auth": "Invalid API key",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This integration is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Muni Times Options",
+        "data": {
+          "update_interval": "Update Interval (seconds)",
+          "max_results": "Maximum Results per Stop",
+          "show_line_icons": "Show Line Icons",
+          "time_format": "Time Format",
+          "time_zone": "Time Zone"
+        }
+      }
+    }
+  }
+}
