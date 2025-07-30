@@ -195,7 +195,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
                     "arrivals": stop_data,
                     "config": stop,
                     "from_cache": False,
-                    "last_updated": self.last_update_success_time,
+                    "last_updated": self.last_update_success,
                 }
                 
                 _LOGGER.debug("Fresh data retrieved for stop %s", stop_code)
@@ -248,7 +248,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
             else:
                 # Complete success
                 self.consecutive_failures = 0
-                self.last_successful_update = self.last_update_success_time
+                self.last_successful_update = self.last_update_success
             
             return data
         
@@ -304,7 +304,7 @@ class MuniTimesDataUpdateCoordinator(DataUpdateCoordinator):
                     "arrivals": stop_data,
                     "config": stop_config,
                     "from_cache": False,
-                    "last_updated": self.last_update_success_time,
+                    "last_updated": self.last_update_success,
                 }
                 
                 # Cache the result
