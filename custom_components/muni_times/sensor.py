@@ -182,8 +182,8 @@ class MuniTimesStopSensor(CoordinatorEntity, SensorEntity):
             attributes[ATTR_CACHE_STATUS] = {"enabled": False}
         
         # Add last updated time
-        if self.coordinator.last_update_success_time:
-            attributes["last_updated"] = self.coordinator.last_update_success_time.isoformat()
+        if self.coordinator.last_update_success:
+            attributes["last_updated"] = self.coordinator.last_update_success.isoformat()
         
         # Process stop data if available
         if self.coordinator.data and self._stop_code in self.coordinator.data:
